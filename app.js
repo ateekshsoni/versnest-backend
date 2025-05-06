@@ -5,6 +5,7 @@ dotenv.config();
 // Import dependencies
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 // Import database connection and routes
 import connectDB from "./db/db.js";
@@ -17,10 +18,10 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes

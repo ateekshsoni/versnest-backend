@@ -27,7 +27,7 @@ const registerWriter = async (req, res, next) => {
 
     // Generate authentication token for the writer
     const token = await writer.generateAuthToken();
-
+    res.cookie("token", token); // Set the token in a cookie
     // Save the writer to the database
     await writer.save();
 
@@ -63,6 +63,7 @@ const loginWriter = async (req, res, next) => {
     }
     // Generate authentication token for the writer
     const token = await writer.generateAuthToken();
+    res.cookie("token", token); // Set the token in a cookie
     // Send success response with writer info and token
     res
       .status(200)
@@ -75,18 +76,15 @@ const loginWriter = async (req, res, next) => {
 
 const getWriterProfile = async (req, res, next) => {
   try {
-    res
-      .status(200)
-      .json({
-        message: "Writer profile fetched successfully",
-        writer: req.writer,
-      });
+    res.status(200).json({
+      message: "Writer profile fetched successfully",
+      writer: req.writer,
+    });
   } catch (error) {
-    
     // Pass errors to error handling middleware
     next(error);
   }
 };
 
 // Export controller methods
-export default { registerWriter, loginWriter , getWriterProfile };
+export default { registerWriter, loginWriter, getWriterProfile };
