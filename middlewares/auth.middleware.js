@@ -1,3 +1,4 @@
+import blacklistTokenModel from "../models/blacklistToken.model.js";
 import ReaderModel from "../models/reader.model.js";
 import writerModel from "../models/writer.model.js";
 import bcrypt from "bcrypt";
@@ -8,6 +9,10 @@ const authReader = async (req, res, next) => {
     const token =
       req.cookies?.token || req.headers.authorization?.split(" ")[1];
     if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const isBlacklisted = await blacklistTokenModel.findOne({ token });
+    if (isBlacklisted) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     try {
@@ -35,6 +40,10 @@ const authWriter = async (req, res, next) => {
     const token =
       req.cookies?.token || req.headers.authorization?.split(" ")[1];
     if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const isBlacklisted = await blacklistTokenModel.findOne({ token });
+    if (isBlacklisted) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     try {

@@ -2,7 +2,7 @@
 import ReaderModel from "../models/reader.model.js";
 import { createReader } from "../services/reader.service.js";
 import { validationResult } from "express-validator";
-
+import blacklistTokenModel from "../models/blacklistToken.model.js";
 // Controller for registering a new reader
 const registerReader = async (req, res, next) => {
   try {
@@ -86,5 +86,21 @@ const getReaderProfile = async (req, res, next) => {
     next(error);
   }
 };
+const logoutReader = async (req, res, next) => {
+    try {
+        // Clear the authentication token cookie
+        const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        res.clearCookie("token");
+        await blacklistTokenModel.create({ token });
+        res.status(200).json({ message: "Reader logged out successfully" });
+    } catch (error) {
+        // Pass errors to error handling middleware
+        next(error);
+    }
+    };
+
 // Export controller methods
-export default { registerReader, loginReader, getReaderProfile };
+export default { registerReader, loginReader, getReaderProfile , logoutReader };

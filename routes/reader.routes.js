@@ -53,6 +53,11 @@ router.get(
   authMiddleware.authReader,
   readerController.getReaderProfile
 );
+router.get(
+  "/logout",
+  authMiddleware.authReader,
+  readerController.logoutReader
+);
 
 // Export the router to be used in the main app
 export default router;

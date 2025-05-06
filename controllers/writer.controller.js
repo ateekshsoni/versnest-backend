@@ -1,3 +1,4 @@
+import blacklistTokenModel from "../models/blacklistToken.model.js";
 import WriterModel from "../models/writer.model.js";
 import { createWriter } from "../services/writer.service.js";
 import { validationResult } from "express-validator";
@@ -86,5 +87,21 @@ const getWriterProfile = async (req, res, next) => {
   }
 };
 
+const writerLogout = async (req, res, next) => {
+  try {
+    // Clear the token cookie
+    const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    res.clearCookie("token");
+    await blacklistTokenModel.create({ token });
+    res.status(200).json({ message: "Writer logged out successfully" });
+  } catch (error) {
+    // Pass errors to error handling middleware
+    next(error);
+  }
+};
+
 // Export controller methods
-export default { registerWriter, loginWriter, getWriterProfile };
+export default { registerWriter, loginWriter, getWriterProfile  , writerLogout };

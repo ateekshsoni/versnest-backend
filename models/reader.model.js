@@ -55,7 +55,7 @@ const ReaderSchema = new mongoose.Schema(
 // Generate JWT auth token for a reader
 ReaderSchema.methods.generateAuthToken = async function () {
   const token = jwt.sign({ _id: this._id.toString() }, process.env.JWT_SECRET, {
-    expiresIn: "7d",
+    expiresIn: "24h",
   });
   return token;
 };
