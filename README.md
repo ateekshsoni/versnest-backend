@@ -1,6 +1,6 @@
 # Backend Overview
 
-This backend is built with Node.js, Express, and MongoDB (via Mongoose). It provides RESTful API endpoints for registering and logging in both readers and writers. Passwords are securely hashed, and JWT tokens are used for authentication. Input validation is handled using express-validator.
+This backend is built with Node.js, Express, and MongoDB (via Mongoose). It provides RESTful API endpoints for registering, logging in, fetching profiles, and logging out for both readers and writers. Passwords are securely hashed, and JWT tokens are used for authentication. Input validation is handled using express-validator.
 
 **Main folders:**
 - `controllers/`: Handle request logic for each route.
@@ -58,6 +58,28 @@ This backend is built with Node.js, Express, and MongoDB (via Mongoose). It prov
 
 ---
 
+## Reader Logout
+
+- **Endpoint:** `GET /reader/logout`
+- **Description:** Log out the authenticated reader.
+- **Authentication:** Required (JWT token in `Authorization` header or `token` cookie)
+
+### Behavior
+- The endpoint blacklists the current token and clears the authentication cookie.
+- If you try to log out again with the same token, you will receive a 401 Unauthorized response (token is already blacklisted).
+- You must send the token with the logout request, either as a cookie or in the Authorization header.
+
+### Success Response
+- **Status:** 200 OK
+- **Body:**
+```json
+{
+  "message": "Reader logged out successfully"
+}
+```
+
+---
+
 ## Writer Registration
 
 - **Endpoint:** `POST /writer/register`
@@ -106,136 +128,30 @@ This backend is built with Node.js, Express, and MongoDB (via Mongoose). It prov
 
 ---
 
-## Reader Login
+## Writer Logout
 
-- **Endpoint:** `POST /reader/login`
-- **Description:** Log in as a reader.
-
-### Request Body
-| Field    | Type   | Required | Description           |
-|----------|--------|----------|-----------------------|
-| email    | String | Yes      | Reader's email        |
-| password | String | Yes      | Reader's password     |
-
-#### Example Request
-```json
-{
-  "email": "jane@example.com",
-  "password": "securePass123"
-}
-```
-
-### Validation Rules
-- `email`: Required, must be valid email
-- `password`: Required, min 6 chars
-
-### Success Response
-- **Status:** 200 OK
-- **Body:**
-```json
-{
-  "message": "Reader logged in successfully",
-  "reader": { /* Reader object */ },
-  "token": "<JWT Token>"
-}
-```
-
----
-
-## Writer Login
-
-- **Endpoint:** `POST /writer/login`
-- **Description:** Log in as a writer.
-
-### Request Body
-| Field    | Type   | Required | Description           |
-|----------|--------|----------|-----------------------|
-| email    | String | Yes      | Writer's email        |
-| password | String | Yes      | Writer's password     |
-
-#### Example Request
-```json
-{
-  "email": "john@example.com",
-  "password": "writerPass456"
-}
-```
-
-### Validation Rules
-- `email`: Required, must be valid email
-- `password`: Required, min 6 chars
-
-### Success Response
-- **Status:** 200 OK
-- **Body:**
-```json
-{
-  "message": "Writer logged in successfully",
-  "writer": { /* Writer object */ },
-  "token": "<JWT Token>"
-}
-```
-
----
-
-## Reader Profile
-
-- **Endpoint:** `GET /reader/profile`
-- **Description:** Fetch the authenticated reader's profile.
+- **Endpoint:** `GET /writer/logout`
+- **Description:** Log out the authenticated writer.
 - **Authentication:** Required (JWT token in `Authorization` header or `token` cookie)
 
-### Request Headers
-| Header         | Value                | Required | Description                |
-|----------------|---------------------|----------|----------------------------|
-| Authorization  | Bearer `<JWT Token>`| Yes      | JWT token from login/register |
+### Behavior
+- The endpoint blacklists the current token and clears the authentication cookie.
+- If you try to log out again with the same token, you will receive a 401 Unauthorized response (token is already blacklisted).
+- You must send the token with the logout request, either as a cookie or in the Authorization header.
 
 ### Success Response
 - **Status:** 200 OK
 - **Body:**
 ```json
 {
-  "message": "Reader profile fetched successfully",
-  "reader": { /* Reader object, excluding password */ }
+  "message": "Writer logged out successfully"
 }
 ```
 
 ---
-
-## Writer Profile
-
-- **Endpoint:** `GET /writer/profile`
-- **Description:** Fetch the authenticated writer's profile.
-- **Authentication:** Required (JWT token in `Authorization` header or `token` cookie)
-
-### Request Headers
-| Header         | Value                | Required | Description                |
-|----------------|---------------------|----------|----------------------------|
-| Authorization  | Bearer `<JWT Token>`| Yes      | JWT token from login/register |
-
-### Success Response
-- **Status:** 200 OK
-- **Body:**
-```json
-{
-  "message": "Writer profile fetched successfully",
-  "writer": { /* Writer object, excluding password */ }
-}
-```
-
----
-
-## Error Responses
-- **Status:** 422 Unprocessable Entity
-- **Body:**
-```json
-{
-  "errors": [
-    { "msg": "Error message", "param": "fieldName", ... }
-  ]
-}
-```
 
 ## Notes
 - Passwords are securely hashed before storage.
-- JWT token is returned for authentication after successful registration.
+- JWT token is returned for authentication after successful registration and login.
 - All endpoints expect and return JSON.
+- Logout endpoints require the token to be sent with the request and will return 401 if the token is missing, invalid, or already blacklisted.
