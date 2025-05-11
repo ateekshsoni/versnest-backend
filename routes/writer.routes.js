@@ -63,7 +63,8 @@ router.get(
   authMiddleware.authWriter,
   writerController.getWriterProfile
 );
-router.get(
+// Route for logging out a writer (should be POST)
+router.post(
   "/logout",
   authMiddleware.authWriter,
   writerController.writerLogout

@@ -53,7 +53,8 @@ router.get(
   authMiddleware.authReader,
   readerController.getReaderProfile
 );
-router.get(
+// Route for logging out a reader (should be POST)
+router.post(
   "/logout",
   authMiddleware.authReader,
   readerController.logoutReader

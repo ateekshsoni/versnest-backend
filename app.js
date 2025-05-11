@@ -6,6 +6,7 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import helmet from "helmet";
 
 // Import database connection and routes
 import connectDB from "./db/db.js";
@@ -19,7 +20,11 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(helmet()); // Security headers
+app.use(cors({
+  origin: process.env.CLIENT_URL || true, // Set to your frontend URL in production
+  credentials: true, // Allow cookies
+}));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
